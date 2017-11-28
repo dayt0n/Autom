@@ -1,0 +1,7 @@
+*.txt
+*.csv
+*.m4v
+uniqueIDs
+ids
+data_backup.py
+.DS_Store
