@@ -62,8 +62,9 @@ if len(sys.argv) < 2:
 serialDev = sys.argv[1]
 print("Connecting to %s") % serialDev
 dev = cantact.CantactDev(serialDev)
-dev.set_bitrate(500000) 
-dev.ser.write('S6\r'.encode()) #comment this line out if you are not on Linux
+dev.set_bitrate(500000)
+if sys.platform == "linux" or sys.platform == "linux2": # b/c SocketCAN
+	dev.ser.write('S6\r'.encode())
 drive = False
 dev.start()
 while not drive:
