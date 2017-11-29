@@ -12,6 +12,7 @@ import cv2
 end = False
 
 def vision(datfile,lastDat):
+	global end
 	cv2.namedWindow("visiond")
 	vc = cv2.VideoCapture(0)
 
@@ -36,6 +37,7 @@ def vision(datfile,lastDat):
 			rval,frame = vc.read()
 			key = cv2.waitKey(1)
 			if key == 27:
+				end = True
 				break
 		else:
 			continue
@@ -60,12 +62,17 @@ if len(sys.argv) < 2:
 serialDev = sys.argv[1]
 print("Connecting to %s") % serialDev
 dev = cantact.CantactDev(serialDev)
-dev.set_bitrate(500000)
+dev.set_bitrate(500000) 
+dev.ser.write('S6\r'.encode()) #comment this line out if you are not on Linux
 drive = False
 dev.start()
 while not drive:
 	try:
 		frame = dev.recv()
+	except (KeyboardInterrupt,SystemExit):
+		print("Exiting...")
+		dev.stop()
+		sys.exit()
 	except:
 		print("exception, trying again")
 		time.sleep(2)
