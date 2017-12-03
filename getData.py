@@ -78,7 +78,7 @@ while not drive:
 		print("exception, trying again")
 		time.sleep(2)
 		continue
-	if frame.arb_id == 0x135 and frame.data[0] != 0x02:
+	if frame.arb_id == 0x135 and frame.data[0] != 0x02: # this also works as a check to see if the car is actually on before you do anything
 		print("Waiting for car to shift to drive")
 	elif frame.arb_id == 0x135 and frame.data[0] == 0x02:
 		print("Drive detected, continuing...")
@@ -105,6 +105,9 @@ while not end:
 	try:
 		frame = dev.recv()
 		writer.writerow([str(time.time()),frame.arb_id,frame.dlc,str(frame.data)])
+		if frame.arb_id == 0xC9 and frame.data[0] == 0x0: # engine has turned off, time to wrap things up...
+			end = True
+			break
 	except (KeyboardInterrupt,SystemExit):
 		end = True
 		break
