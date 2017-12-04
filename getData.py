@@ -92,6 +92,8 @@ if os.path.isfile("data_latest.txt"): # check for remnants of last data backup i
 
 latestDat = open("data_latest.txt","w")
 thisTime = str(datetime.datetime.now())
+thisTime.replace(" ","_") # replace spaces with underscores for better navigation
+thisTime.replace("/","-") # same with forward slashes
 latestDat.write(thisTime + "\n") # let backup service know start time
 filename = "CAN_" + thisTime + ".csv"
 latestDat.write(filename + "\n") # let backup service know latest file

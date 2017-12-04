@@ -1,7 +1,7 @@
 *.txt
 *.csv
 *.m4v
+*.zip
 uniqueIDs
 ids
-data_backup.py
 .DS_Store
