@@ -7,13 +7,15 @@ import zipfile
 import socket
 
 prkey = "/Users/DaytonHasty/.ssh/car_backup_rsa"
+server = "192.168.1.157"
+portNum = 56382
 end = False
 latest = True
 
 def canConnect():
 	try:
 		socket.setdefaulttimeout(3)
-		socket.socket(socket.AF_INET,socket.SOCK_STREAM).connect(("192.168.1.157",56382)) # only backup on home network
+		socket.socket(socket.AF_INET,socket.SOCK_STREAM).connect((server,portNum)) # only backup on home network
 		return True
 	except Exception as ex:
 		return False
@@ -57,7 +59,7 @@ while not end:
 	if not latest:
 		os.rename("output_" + CANtime + ".m4v","output.m4v")
 	#SFTP stuff
-	srv = pysftp.Connection(host="192.168.1.157",username="carbackup",private_key=prkey,log="/tmp/pysftp.log")
+	srv = pysftp.Connection(host=server,username="carbackup",private_key=prkey,log="/tmp/pysftp.log",port=portNum)
 	end = False
 	with srv.cd("/home/carbackup/backup"):
 		if srv.isfile(CANtime + ".zip"): # file is already there, no need to continue
