@@ -56,10 +56,38 @@ class myThread(threading.Thread):
 		vision(self.datfile,lastDat)
 		print("Stopping video service...")
 
-if len(sys.argv) < 2:
-	print("Insufficient arguments\nusage: %s [/dev/cu.*]") % sys.argv[0]
-	sys.exit(0)
-serialDev = sys.argv[1]
+if sys.argv[2] == "-h" or sys.argv[2] == "--help":
+	print("usage: %s [/dev/cu.*]") % sys.argv[0]
+	exit(0)
+serialDev = ""
+if len(sys.argv) == 1:
+	# autodetect mode on, attempting to find serial device...
+	while True
+		devList = os.listdir("/dev/")
+		devCount = 0
+		finalDevice
+		for f in devList:
+			if sys.platform == "linux" or sys.platform == "linux2":
+				if "ttyACM" in f:
+					devCount += 1
+					serialDev = "/dev/" + f
+			elif sys.platform == "darwin":
+				if "tty.usbmodem" in f:
+					devCount += 1
+					serialDev = "/dev/" + f
+		if devCount == 0:
+			print("Unable to locate a serial device")
+			time.sleep(3)
+			continue
+		elif devCount == 1:
+			print("Using device %s") % serialDev
+			break
+		elif devCount > 1:
+			print("Multiple serial devices plugged, in. Please remove any extraneous devices.")
+			time.sleep(3)
+			continue
+else:
+	serialDev = sys.argv[1]
 print("Connecting to %s") % serialDev
 dev = cantact.CantactDev(serialDev)
 dev.set_bitrate(500000)
@@ -118,3 +146,4 @@ vidThread.join()
 file.close()
 latestDat.close()
 dev.stop()
+exit(0)
