@@ -94,3 +94,4 @@ while not end:
 	os.remove(CANfile)
 	dat.close()
 	srv.close()
+exit(0)
