@@ -8,9 +8,10 @@ import socket
 
 prkey = "/Users/DaytonHasty/.ssh/car_backup_rsa"
 server = "192.168.1.157"
+user = "carbackup"
 portNum = 56382
-end = False
-latest = True
+ifPassword = False
+sshPass = ""
 
 def canConnect():
 	try:
@@ -30,6 +31,8 @@ def checkFileTransfer(srv,zipName):
 			val = False
 	return val
 
+end = False
+latest = True
 while not end:
 	if not canConnect():
 		print("Unable to find backup server, check internet connection. Retrying...")
@@ -59,7 +62,10 @@ while not end:
 	if not latest:
 		os.rename("output_" + CANtime + ".m4v","output.m4v")
 	#SFTP stuff
-	srv = pysftp.Connection(host=server,username="carbackup",private_key=prkey,log="/tmp/pysftp.log",port=portNum)
+	if ifPassword:
+		srv = pysftp.Connection(host=server,username=user,password=sshPass,log="/tmp/pysftp.log",port=portNum)
+	else
+		srv = pysftp.Connection(host=server,username=user,private_key=prkey,log="/tmp/pysftp.log",port=portNum)
 	end = False
 	with srv.cd("/home/carbackup/backup"):
 		if srv.isfile(CANtime + ".zip"): # file is already there, no need to continue
