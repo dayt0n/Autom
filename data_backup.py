@@ -13,7 +13,7 @@ latest = True
 def canConnect():
 	try:
 		socket.setdefaulttimeout(3)
-		socket.socket(socket.AF_INET,socket.SOCK_STREAM).connect(("192.168.1.157",22))
+		socket.socket(socket.AF_INET,socket.SOCK_STREAM).connect(("192.168.1.157",56382)) # only backup on home network
 		return True
 	except Exception as ex:
 		return False
