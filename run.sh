@@ -14,7 +14,8 @@ while true; do
 	rc=$?
 	if [ $rc != 0 ]; then
 		counter=$((counter+1))
-		if [ counter -gt 2 ]; then
+		sleep 5
+		if [ "$counter" -gt 2 ]; then
 			echo "Error in idleWait.py";
 			echo $rc;
 			echo "Exiting";
