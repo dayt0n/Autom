@@ -56,7 +56,7 @@ class myThread(threading.Thread):
 		vision(self.datfile,lastDat)
 		print("Stopping video service...")
 
-if len(sys.argv[2]) > 1:
+if len(sys.argv) > 1:
 	if sys.argv[2] == "-h" or sys.argv[2] == "--help":
 		print("usage: %s [/dev/cu.*]") % sys.argv[0]
 		exit(0)

@@ -11,7 +11,7 @@ while true; do
 	python data_backup.py
 	python idleWait.py
 	rc=$?
-	if [[ $rc != 0 ]]; then 
+	if [ $rc != 0 ]; then 
 		echo "Error in idleWait.py";
 		echo $rc;
 		echo "Exiting";
