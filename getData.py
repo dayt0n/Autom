@@ -66,7 +66,6 @@ if len(sys.argv) == 1:
 	while True:
 		devList = os.listdir("/dev/")
 		devCount = 0
-		finalDevice
 		for f in devList:
 			if sys.platform == "linux" or sys.platform == "linux2":
 				if "ttyACM" in f:
