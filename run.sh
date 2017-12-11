@@ -19,5 +19,6 @@ while true; do
 			echo $rc;
 			echo "Exiting";
 			exit;
+		fi
 	fi
 done
