@@ -4,6 +4,7 @@
 #
 # to be run at startup on dedicated connected computer
 
+counter=0
 cd $(dirname $0)
 unamestr=`uname`
 while true; do
@@ -11,10 +12,12 @@ while true; do
 	python data_backup.py
 	python idleWait.py
 	rc=$?
-	if [ $rc != 0 ]; then 
-		echo "Error in idleWait.py";
-		echo $rc;
-		echo "Exiting";
-		exit;
+	if [ $rc != 0 ]; then
+		counter=$((counter+1))
+		if [ counter -gt 2 ]; then
+			echo "Error in idleWait.py";
+			echo $rc;
+			echo "Exiting";
+			exit;
 	fi
 done
