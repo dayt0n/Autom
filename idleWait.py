@@ -46,8 +46,8 @@ if sys.platform == "linux" or sys.platform == "linux2":
 	dev.ser.write('S6\r'.encode())
 dev.start()
 while True:
-	frame = dev.recv(filter=0xC9)
-	if frame.data[0] != 0x0:
+	frame = dev.recv()
+	if frame.arb_id = 0xC9 and frame.data[0] != 0x0:
 		print("Engine started, beginning data connection")
 		break
 	time.sleep(120) # sleep for two minutes as not to plague the car with requests
