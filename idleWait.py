@@ -37,15 +37,6 @@ if len(sys.argv) == 1:
 			continue
 else:
 	serialDev = sys.argv[1]
-# must wait for device to be free
-while True:
-	proc = subprocess.Popen('lsof | grep ' + serialDev, stdout=subprocess.PIPE)
-	tmp = proc.stdout.read()
-	if "Modem" in tmp:
-		sleep(5)
-		continue
-	else:
-		break
 print("Connecting to %s") % serialDev
 dev = cantact.CantactDev(serialDev)
 if not dev:

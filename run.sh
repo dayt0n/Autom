@@ -7,6 +7,8 @@
 counter=0
 cd $(dirname $0)
 unamestr=`uname`
+echo "Allowing device time to be free"
+sleep 20 # wait for device to intialize
 while true; do
 	python getData.py
 	python data_backup.py
