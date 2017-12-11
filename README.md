@@ -18,7 +18,12 @@ Hardware
 
 How To Use
 ==========
-1. Setup an SSH server on a home computer that will always be on.
+1. Create carbackup user
+```bash
+adduser carbackup
+usermod -aG sudo carbackup
+```
+2. Setup an SSH server on a home computer that will always be on.
 ```bash
 sudo apt-get install openssh-server
 ```
@@ -31,17 +36,17 @@ ssh-keygen -b 4096
 ```bash
 ssh-copy-id username@hostIP
 ```
-2. Create backup folder in home directory on the remote computer.
+3. Create backup folder in home directory on the remote computer.
 ```bash
 mkdir ~/backup/
 ```
-3. Specify the server IP, username, password, port number (default is 22 for SSH), and make sure `ifPassword = True` and set `sshPass` in [data_backup.py](data_backup.py).
+4. Specify the server IP, username, password, port number (default is 22 for SSH), and make sure `ifPassword = True` and set `sshPass` in [data_backup.py](data_backup.py).
 ### (Optional) For those using a private key
   * Specify the server IP, username, private key location, port number, and make sure `ifPassword = False` in [data_backup.py](data_backup.py).
-4. On PC for car installation, clone a copy of Autom anywhere.
-5. Add `gnome-terminal -e "path/to/Autom/run.sh"` to startup applications.
-6. Make sure car PC has the home network as a known network.
-7. Plug in CANtact/CANable into vehicle OBD-II port and then into car PC usb port.
-8. Attach webcamera to front of rearview mirror to get a view of the road, then plug into car PC.
-9. Attach car PC to vehicle power source.
-10. Power on the PC and the car and start driving.
+5. On PC for car installation, clone a copy of Autom anywhere.
+6. Add `gnome-terminal -e "path/to/Autom/run.sh"` to startup applications.
+7. Make sure car PC has the home network as a known network.
+8. Plug in CANtact/CANable into vehicle OBD-II port and then into car PC usb port.
+9. Attach webcamera to front of rearview mirror to get a view of the road, then plug into car PC.
+10. Attach car PC to vehicle power source.
+11. Power on the PC and the car and start driving.
