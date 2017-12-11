@@ -90,7 +90,7 @@ else:
 	serialDev = sys.argv[1]
 # must wait for device to be free
 while True:
-	proc = Popen('lsof | grep ' + serialDev, stdout=subprocess.PIPE)
+	proc = subprocess.Popen('lsof | grep ' + serialDev, stdout=subprocess.PIPE)
 	tmp = proc.stdout.read()
 	if "Modem" in tmp:
 		sleep(5)
