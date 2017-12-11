@@ -4,7 +4,7 @@ from pyvit import can
 from pyvit.hw import cantact
 import time
 import datetime
-from subprocess import call
+import subprocess
 import csv
 import threading
 import cv2
@@ -88,6 +88,15 @@ if len(sys.argv) == 1:
 			continue
 else:
 	serialDev = sys.argv[1]
+# must wait for device to be free
+while True:
+	proc = Popen('lsof | grep ' + serialDev, stdout=subprocess.PIPE)
+	tmp = proc.stdout.read()
+	if "Modem" in tmp:
+		sleep(5)
+		continue
+	else:
+		break
 print("Connecting to %s") % serialDev
 dev = cantact.CantactDev(serialDev)
 dev.set_bitrate(500000)

@@ -3,6 +3,7 @@ import sys
 from pyvit import can
 from pyvit.hw import cantact
 import time
+import subprocess
 
 if len(sys.argv) > 1:
 	if sys.argv[2] == "-h" or sys.argv[2] == "--help":
@@ -36,6 +37,15 @@ if len(sys.argv) == 1:
 			continue
 else:
 	serialDev = sys.argv[1]
+# must wait for device to be free
+while True:
+	proc = Popen('lsof | grep ' + serialDev, stdout=subprocess.PIPE)
+	tmp = proc.stdout.read()
+	if "Modem" in tmp:
+		sleep(5)
+		continue
+	else:
+		break
 print("Connecting to %s") % serialDev
 dev = cantact.CantactDev(serialDev)
 if not dev:
