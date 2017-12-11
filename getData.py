@@ -56,13 +56,14 @@ class myThread(threading.Thread):
 		vision(self.datfile,lastDat)
 		print("Stopping video service...")
 
-if sys.argv[2] == "-h" or sys.argv[2] == "--help":
-	print("usage: %s [/dev/cu.*]") % sys.argv[0]
-	exit(0)
+if len(sys.argv[2]) > 1:
+	if sys.argv[2] == "-h" or sys.argv[2] == "--help":
+		print("usage: %s [/dev/cu.*]") % sys.argv[0]
+		exit(0)
 serialDev = ""
 if len(sys.argv) == 1:
 	# autodetect mode on, attempting to find serial device...
-	while True
+	while True:
 		devList = os.listdir("/dev/")
 		devCount = 0
 		finalDevice

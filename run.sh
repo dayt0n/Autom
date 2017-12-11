@@ -4,6 +4,7 @@
 #
 # to be run at startup on dedicated connected computer
 
+cd ($dirname $0)
 unamestr=`uname`
 while true; do
 	python getData.py
@@ -13,13 +14,7 @@ while true; do
 	if [[ $rc != 0 ]]; then 
 		echo "Error in idleWait.py";
 		echo $rc;
-		if [[ "$unamestr" == 'Linux']]; then
-			echo "Shutting down in 10 seconds"
-			sleep 10
-			poweroff # shutdown w/o sudo
-		else
-			echo "Exiting"
-			exit
-		fi
+		echo "Exiting"
+		exit
 	fi
 done

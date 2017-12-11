@@ -64,7 +64,7 @@ while not end:
 	#SFTP stuff
 	if ifPassword:
 		srv = pysftp.Connection(host=server,username=user,password=sshPass,log="/tmp/pysftp.log",port=portNum)
-	else
+	else:
 		srv = pysftp.Connection(host=server,username=user,private_key=prkey,log="/tmp/pysftp.log",port=portNum)
 	end = False
 	with srv.cd("/home/carbackup/backup"):
