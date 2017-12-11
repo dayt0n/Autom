@@ -4,7 +4,7 @@
 #
 # to be run at startup on dedicated connected computer
 
-cd ($dirname $0)
+cd $(dirname $0)
 unamestr=`uname`
 while true; do
 	python getData.py
@@ -14,7 +14,7 @@ while true; do
 	if [[ $rc != 0 ]]; then 
 		echo "Error in idleWait.py";
 		echo $rc;
-		echo "Exiting"
-		exit
+		echo "Exiting";
+		exit;
 	fi
 done
