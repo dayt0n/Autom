@@ -128,7 +128,7 @@ if os.path.isfile("data_latest.txt"): # check for remnants of last data backup i
 	with open("data_latest.txt","r") as f:
 		firstLine = f.readline().rstrip()
 	lastDat = "data_" + firstLine + ".txt"
-	os.rename("data_latest.txt","data_" + firstLine + ".txt")
+	os.rename("data_latest.txt",lastDat)
 
 latestDat = open("data_latest.txt","w")
 thisTime = str(datetime.datetime.now())
