@@ -7,7 +7,7 @@ import datetime
 import zipfile
 import socket
 
-prkey = "/Users/DaytonHasty/.ssh/car_backup_rsa"
+prkey = "/home/dayt0n/.ssh/carbackup_rsa"
 server = "192.168.1.157"
 user = "carbackup"
 portNum = 56382

@@ -51,6 +51,7 @@ while True:
 	if frame.arb_id == 0xC9 and frame.data[0] != 0x0:
 		print("Engine started, beginning data connection")
 		break
-	time.sleep(120) # sleep for two minutes as not to plague the car with requests
+	elif frame.arb_id == 0xC9 and frame.data[0] == 0x0:
+		time.sleep(120) # sleep for two minutes as not to plague the car with requests
 dev.stop()
 exit(0)
