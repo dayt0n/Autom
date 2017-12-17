@@ -137,7 +137,7 @@ thisTime.replace("/","-") # same with forward slashes
 latestDat.write(thisTime + "\n") # let backup service know start time
 filename = "CAN_" + thisTime + ".csv"
 latestDat.write(filename + "\n") # let backup service know latest file
-file = open(filename,"a+")
+file = open(filename,"wa")
 writer = csv.writer(file,delimiter=",",quotechar=" ",quoting=csv.QUOTE_MINIMAL,lineterminator='\n')
 writer.writerow(['Time','ID','DLC','Data'])
 print("Collecting data in " + filename + "...")
