@@ -1,4 +1,5 @@
 import os
+import getpass
 import pysftp
 import sys
 import time
@@ -12,6 +13,22 @@ user = "carbackup"
 portNum = 56382
 ifPassword = False
 sshPass = ""
+
+def hasExternalStorage():
+	login = getpass.getuser()
+	medias = os.listdir("/media/"+login+"/")
+	if len(medias) == 0:
+		return False
+	else:
+		return str(medias[0])
+
+def hasExternalServerStorage(srv):
+	with srv.cd("/media/"+user):
+		devs = srv.listdir()
+		if len(devs) == 0:
+			return False
+		else:
+			return str(devs[0])
 
 def canConnect():
 	try:
@@ -33,6 +50,9 @@ def checkFileTransfer(srv,zipName):
 
 end = False
 latest = True
+extStorage = hasExternalStorage()
+if extStorage:
+	os.chdir(extStorage)
 while not end:
 	if not canConnect():
 		print("Unable to find backup server, check internet connection. Retrying...")
@@ -67,7 +87,16 @@ while not end:
 	else:
 		srv = pysftp.Connection(host=server,username=user,private_key=prkey,log="/tmp/pysftp.log",port=portNum)
 	end = False
-	with srv.cd("/home/carbackup/backup"):
+	serverMedia = hasExternalServerStorage(srv)
+	if serverMedia:
+		serverCD = "/media/" + user + "/" + serverMedia
+	else:
+		serverCD = "/home/" + user
+	with srv.cd(serverCD):
+		if not srv.isdir("backup"):
+			srv.mkdir("backup")
+	serverCD += "backup"
+	with srv.cd(serverCD):
 		if srv.isfile(CANtime + ".zip"): # file is already there, no need to continue
 			print("File aready exists, continuing.")
 			continue
@@ -77,7 +106,7 @@ while not end:
 		currentZip.write("data_latest.txt")
 		currentZip.write("output.m4v")
 		currentZip.write(CANfile)
-	with srv.cd("/home/carbackup/backup"):
+	with srv.cd(serverCD):
 		print("uploading zip file")
 		if not srv.put(zipName,preserve_mtime=True):
 			print("Error uploading, deleting zip...")
@@ -89,7 +118,7 @@ while not end:
 	os.remove(zipName)
 	if didTransfer == False:
 		print("File mismatch, deleting...")
-		with srv.cd("/home/carbackup/backup"):
+		with srv.cd(serverCD):
 			srv.remove(zipName)
 		os.rename("data_latest.txt","data_" + CANtime + ".txt")
 		os.rename("output.m4v","output_" + CANtime + ".m4v")

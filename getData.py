@@ -1,5 +1,6 @@
 import os
 import sys
+import getpass
 from pyvit import can
 from pyvit.hw import cantact
 import time
@@ -10,6 +11,14 @@ import threading
 import cv2
 
 end = False
+
+def hasExternalStorage():
+	login = getpass.getuser()
+	medias = os.listdir("/media/"+login+"/")
+	if len(medias) == 0:
+		return False
+	else:
+		return str(medias[0])
 
 def vision(datfile,lastDat):
 	global end
@@ -94,6 +103,9 @@ dev.set_bitrate(500000)
 if sys.platform == "linux" or sys.platform == "linux2": # b/c SocketCAN
 	dev.ser.write('S6\r'.encode())
 drive = False
+hasDevice = hasExternalStorage()
+if hasDevice:
+	os.chdir(hasDevice)
 dev.start()
 while not drive:
 	try:
