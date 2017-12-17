@@ -134,10 +134,11 @@ latestDat = open("data_latest.txt","w")
 thisTime = str(datetime.datetime.now())
 thisTime.replace(" ","_") # replace spaces with underscores for better navigation
 thisTime.replace("/","-") # same with forward slashes
+thisTime.replace(":","-")
 latestDat.write(thisTime + "\n") # let backup service know start time
 filename = "CAN_" + thisTime + ".csv"
 latestDat.write(filename + "\n") # let backup service know latest file
-file = open(filename,"wa")
+file = open(filename,"a+")
 writer = csv.writer(file,delimiter=",",quotechar=" ",quoting=csv.QUOTE_MINIMAL,lineterminator='\n')
 writer.writerow(['Time','ID','DLC','Data'])
 print("Collecting data in " + filename + "...")
