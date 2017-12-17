@@ -105,7 +105,7 @@ if sys.platform == "linux" or sys.platform == "linux2": # b/c SocketCAN
 drive = False
 hasDevice = hasExternalStorage()
 if hasDevice:
-	os.chdir("hasDevice)
+	os.chdir(hasDevice)
 dev.start()
 while not drive:
 	try:
