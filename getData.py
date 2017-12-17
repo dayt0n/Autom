@@ -18,7 +18,7 @@ def hasExternalStorage():
 	if len(medias) == 0:
 		return False
 	else:
-		return str(medias[0])
+		return str("/media/" + login + "/" + medias[0])
 
 def vision(datfile,lastDat):
 	global end
@@ -105,7 +105,7 @@ if sys.platform == "linux" or sys.platform == "linux2": # b/c SocketCAN
 drive = False
 hasDevice = hasExternalStorage()
 if hasDevice:
-	os.chdir(hasDevice)
+	os.chdir("hasDevice)
 dev.start()
 while not drive:
 	try:

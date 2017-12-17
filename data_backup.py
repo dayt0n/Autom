@@ -20,7 +20,7 @@ def hasExternalStorage():
 	if len(medias) == 0:
 		return False
 	else:
-		return str(medias[0])
+		return str("/media/" + login + "/" + medias[0])
 
 def hasExternalServerStorage(srv):
 	with srv.cd("/media/"+user):
@@ -28,7 +28,7 @@ def hasExternalServerStorage(srv):
 		if len(devs) == 0:
 			return False
 		else:
-			return str(devs[0])
+			return str("/media/" + user + "/" + devs[0])
 
 def canConnect():
 	try:
