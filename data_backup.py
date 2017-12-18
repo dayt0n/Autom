@@ -51,9 +51,13 @@ config.read('config.cfg')
 prkey = config.get('SFTP','prkey')
 server = config.get('SFTP','server')
 user = config.get('SFTP','user')
-portNum = config.get('SFTP','portNum')
+portNum = int(config.get('SFTP','portNum'))
 ifPassword = config.get('SFTP','ifPassword')
 sshPass = config.get('SFTP',"sshPass")
+if ifPassword == "false":
+	ifPassword = False
+else:
+	ifPassword = True
 
 end = False
 latest = True
