@@ -23,12 +23,15 @@ def hasExternalStorage():
 		return str("/media/" + login + "/" + medias[0])
 
 def hasExternalServerStorage(srv):
-	with srv.cd("/media/"+user):
-		devs = srv.listdir()
-		if len(devs) == 0:
-			return False
+	with srv.cd("/media/"):
+		if srv.isdir(user):
+			devs = srv.listdir()
+			if len(devs) == 0:
+				return False
+			else:
+				return str("/media/" + user + "/" + devs[0])
 		else:
-			return str("/media/" + user + "/" + devs[0])
+			return False
 
 def canConnect():
 	try:
@@ -82,10 +85,12 @@ while not end:
 	if not latest:
 		os.rename("output_" + CANtime + ".m4v","output.m4v")
 	#SFTP stuff
+	cnopts = pysftp.CnOpts()
+	cnopts.hostkeys = None
 	if ifPassword:
-		srv = pysftp.Connection(host=server,username=user,password=sshPass,log="/tmp/pysftp.log",port=portNum)
+		srv = pysftp.Connection(host=server,username=user,password=sshPass,log="/tmp/pysftp.log",port=portNum,cnopts=cnopts)
 	else:
-		srv = pysftp.Connection(host=server,username=user,private_key=prkey,log="/tmp/pysftp.log",port=portNum)
+		srv = pysftp.Connection(host=server,username=user,private_key=prkey,log="/tmp/pysftp.log",port=portNum,cnopts=cnopts)
 	end = False
 	serverMedia = hasExternalServerStorage(srv)
 	if serverMedia:
