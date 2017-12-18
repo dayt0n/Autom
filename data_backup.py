@@ -6,13 +6,7 @@ import time
 import datetime
 import zipfile
 import socket
-
-prkey = "/home/dayt0n/.ssh/carbackup_rsa"
-server = "192.168.1.157"
-user = "carbackup"
-portNum = 56382
-ifPassword = False
-sshPass = ""
+import configparser
 
 def hasExternalStorage():
 	login = getpass.getuser()
@@ -50,6 +44,16 @@ def checkFileTransfer(srv,zipName):
 		if attr.st_size != osattr.st_size and os.st_size != 0:
 			val = False
 	return val
+
+config = configparser.ConfigParser()
+config.read('config.cfg')
+
+prkey = config.get('SFTP','prkey')
+server = config.get('SFTP','server')
+user = config.get('SFTP','user')
+portNum = config.get('SFTP','portNum')
+ifPassword = config.get('SFTP','ifPassword')
+sshPass = config.get('SFTP',"sshPass")
 
 end = False
 latest = True
