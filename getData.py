@@ -9,6 +9,7 @@ import subprocess
 import csv
 import threading
 import cv2
+import bz2
 
 end = False
 
@@ -103,9 +104,10 @@ dev.set_bitrate(500000)
 if sys.platform == "linux" or sys.platform == "linux2": # b/c SocketCAN
 	dev.ser.write('S6\r'.encode())
 drive = False
-hasDevice = hasExternalStorage()
-if hasDevice:
-	os.chdir(hasDevice)
+if sys.platform == "linux" or sys.platform == "linux2":
+	hasDevice = hasExternalStorage()
+	if hasDevice:
+		os.chdir(hasDevice)
 dev.start()
 while not drive:
 	try:
@@ -138,7 +140,7 @@ thisTime = thisTime.replace(":","-")
 latestDat.write(thisTime + "\n") # let backup service know start time
 filename = "CAN_" + thisTime + ".csv"
 latestDat.write(filename + "\n") # let backup service know latest file
-file = open(filename,"a+")
+file = bz2.BZ2File(filename,"wb")
 writer = csv.writer(file,delimiter=",",quotechar=" ",quoting=csv.QUOTE_MINIMAL,lineterminator='\n')
 writer.writerow(['Time','ID','DLC','Data'])
 print("Collecting data in " + filename + "...")
