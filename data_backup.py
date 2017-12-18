@@ -100,7 +100,7 @@ while not end:
 	with srv.cd(serverCD):
 		if not srv.isdir("backup"):
 			srv.mkdir("backup")
-	serverCD += "backup"
+	serverCD += "/backup"
 	with srv.cd(serverCD):
 		if srv.isfile(CANtime + ".zip"): # file is already there, no need to continue
 			print("File aready exists, continuing.")
