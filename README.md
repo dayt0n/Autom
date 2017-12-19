@@ -12,7 +12,7 @@ Requirements
 Hardware
 --------
 * [CANtact](https://store.linklayer.com/products/cantact-v1-0?variant=1151776209) OR [CANable](https://www.tindie.com/products/protofusion/canable-usb-to-can-bus-adapter/)
-* [Raspberry Pi](https://www.raspberrypi.org/products/) or other small computer/mini PC running Linux
+* [Raspberry Pi](https://www.raspberrypi.org/products/) or other small computer/mini PC running Linux (if you use a Pi, you may want to also get a [UPS for it as well](https://www.adafruit.com/product/1944) for data backup operations after the car is turned off)
 * Any secondary PC at home that is always on (preferably running some Linux distribution, but not necessary)
 * A reasonably priced good to high quality webcamera. Personal recommendation: [Microsoft LifeCam HD-3000](https://www.amazon.com/Microsoft-3364820-LifeCam-HD-3000/dp/B008ZVRAQS)
 
@@ -35,9 +35,9 @@ ssh-copy-id username@hostIP
 ```bash
 mkdir ~/backup/
 ```
-3. Specify the server IP, username, password, port number (default is 22 for SSH), and make sure `ifPassword = True` and set `sshPass` in [data_backup.py](data_backup.py).
+3. Specify the server IP, username, password, port number (default is 22 for SSH), and make sure `ifPassword = True` and set `sshPass` in [config.cfg](config.cfg).
 ### (Optional) For those using a private key
-  * Specify the server IP, username, private key location, port number, and make sure `ifPassword = False` in [data_backup.py](data_backup.py).
+  * Specify the server IP, username, private key location, port number, and make sure `ifPassword = False` in [config.cfg](config.cfg).
 4. On PC for car installation, clone a copy of Autom anywhere.
 5. Add `gnome-terminal -e "path/to/Autom/run.sh"` to startup applications.
 6. Make sure car PC has the home network as a known network.
