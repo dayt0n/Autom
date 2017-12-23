@@ -40,7 +40,7 @@ mkdir ~/backup/
 ### (Optional) For those using a private key
   * Specify the server IP, username, private key location, port number, and make sure `ifPassword = False` in [config.cfg](config.cfg).
 4. On PC for car installation, clone a copy of Autom anywhere.
-5. Add `gnome-terminal -e "path/to/Autom/run.sh"` to startup applications.
+5. Add `gnome-terminal -e "path/to/Autom/run.sh"` to startup applications on the car PC. If you are using Ubuntu, you can do this by `cd`'ing to the root directory of this project and executing the following command: `echo -e "[Desktop Entry]\nType=Application\nName=Autom\nExec=gnome-terminal -e \"`pwd`/run.sh\"\nIcon=\nComment=\nX-GNOME-Autostart-enabled=true" >> ~/.config/autostart/Autom.desktop`.
 6. Make sure car PC has the home network as a known network.
 7. Plug in CANtact/CANable into vehicle OBD-II port and then into car PC usb port.
 8. Attach webcamera to front of rearview mirror to get a view of the road, then plug into car PC.
