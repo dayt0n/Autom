@@ -61,13 +61,18 @@ else:
 
 end = False
 latest = True
+connectTimeout = 0
 extStorage = hasExternalStorage()
 if extStorage:
 	os.chdir(extStorage)
 while not end:
 	if not canConnect():
+		if connectTimeout >= 40: # wait two minutes
+			print("Connection no where near by, quitting...")
+			exit(0)
 		print("Unable to find backup server, check internet connection. Retrying...")
 		time.sleep(3)
+		connectTimeout += 1
 		continue
 	if not os.path.isfile("data_latest.txt"): # check for past unbacked up files
 		print("No data_latest.txt, searching for unbacked up files...")
