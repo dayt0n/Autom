@@ -10,6 +10,7 @@ import csv
 import threading
 import cv2
 import bz2
+import configparser
 
 end = False
 
@@ -66,10 +67,27 @@ class myThread(threading.Thread):
 		vision(self.datfile,lastDat)
 		print("Stopping video service...")
 
+
 if len(sys.argv) > 1:
 	if sys.argv[2] == "-h" or sys.argv[2] == "--help":
 		print("usage: %s [/dev/cu.*]") % sys.argv[0]
 		exit(0)
+
+config = configparser.ConfigParser()
+config.read('config.cfg')
+vehicle = config.get('DRIVE','vehicle')
+if vehicle == "CHEVY VOLT":
+	GEAR_SHIFT = 0x135 # ID for GEAR_SHIFT
+	DRIVE = 0x02
+	SHIFT_PLACE = 0x0 # place is byte in data like this: { [here] [~] [~] [~] [~] [~] [~] [~] }
+	ENGINE_STATUS = 0xC9
+	ENGINE_OFF = 0x0
+	ENGINE_OFF_PLACE = 0x0
+else:
+	print("Vehicle not supported, exiting...")
+	exit(0)
+# more options to come in the future
+
 serialDev = ""
 if len(sys.argv) == 1:
 	# autodetect mode on, attempting to find serial device...
@@ -120,9 +138,9 @@ while not drive:
 		print("exception, trying again")
 		time.sleep(2)
 		continue
-	if frame.arb_id == 0x135 and frame.data[0] != 0x02: # this also works as a check to see if the car is actually on before you do anything
+	if frame.arb_id == GEAR_SHIFT and frame.data[SHIFT_PLACE] != DRIVE: # this also works as a check to see if the car is actually on before you do anything
 		print("Waiting for car to shift to drive")
-	elif frame.arb_id == 0x135 and frame.data[0] == 0x02:
+	elif frame.arb_id == GEAR_SHIFT and frame.data[SHIFT_PLACE] == DRIVE:
 		print("Drive detected, continuing...")
 		drive = True
 lastDat = "data_latest.txt"
@@ -150,7 +168,7 @@ while not end:
 	try:
 		frame = dev.recv()
 		writer.writerow([str(time.time()),frame.arb_id,frame.dlc,str(frame.data)])
-		if frame.arb_id == 0xC9 and frame.data[0] == 0x0: # engine has turned off, time to wrap things up...
+		if frame.arb_id == ENGINE_STATUS and frame.data[ENGINE_OFF_PLACE] == ENGINE_OFF: # engine has turned off, time to wrap things up...
 			end = True
 			break
 	except (KeyboardInterrupt,SystemExit):

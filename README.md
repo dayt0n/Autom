@@ -8,6 +8,7 @@ Requirements
 * [OpenCV](https://pypi.python.org/pypi/opencv-python)
 * [pysftp](https://pypi.python.org/pypi/pysftp)
 * [pyvit](https://github.com/linklayer/pyvit)
+* [ConfigParser](https://docs.python.org/2/library/configparser.html)
 
 Hardware
 --------
