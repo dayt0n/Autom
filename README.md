@@ -5,10 +5,11 @@ A data recording and video capturing module written in Python for a Chevy Volt.
 Requirements
 ============
 * [Python 2.7](https://www.python.org/download/releases/2.7/)
-* [OpenCV](https://pypi.python.org/pypi/opencv-python)
+* [OpenCV (Python and C++)](https://github.com/opencv/opencv)
 * [pysftp](https://pypi.python.org/pypi/pysftp)
 * [pyvit](https://github.com/linklayer/pyvit)
 * [ConfigParser](https://docs.python.org/2/library/configparser.html)
+* [moviepy](https://pypi.python.org/pypi/moviepy)
 
 Hardware
 --------
@@ -17,8 +18,8 @@ Hardware
 * Any secondary PC at home that is always on (preferably running some Linux distribution, but not necessary)
 * A reasonably priced good to high quality webcamera. Personal recommendation: [Microsoft LifeCam HD-3000](https://www.amazon.com/Microsoft-3364820-LifeCam-HD-3000/dp/B008ZVRAQS)
 
-How To Use
-==========
+How To Use Recording
+====================
 1. Setup an SSH server on a home computer that will always be on.
 ```bash
 sudo apt-get install openssh-server
@@ -42,7 +43,7 @@ mkdir ~/backup/
 4. On PC for car installation, clone a copy of Autom anywhere.
 5. Add `gnome-terminal -e "path/to/Autom/run.sh"` to startup applications on the car PC. If you are using Ubuntu, you can do this by `cd`'ing to the root directory of this project and executing the following command: 
 ```bash
-echo -e "[Desktop Entry]\nType=Application\nName=Autom\nExec=gnome-terminal -e \"`pwd`/run.sh\"\nIcon=\nComment=\nX-GNOME-Autostart-enabled=true" >> ~/.config/autostart/Autom.desktop
+echo -e "[Desktop Entry]\nType=Application\nName=Autom\nExec=gnome-terminal -e \"`pwd`/record/run.sh\"\nIcon=\nComment=\nX-GNOME-Autostart-enabled=true" >> ~/.config/autostart/Autom.desktop
 ```
 6. Make sure car PC has the home network as a known network.
 7. Plug in CANtact/CANable into vehicle OBD-II port and then into car PC usb port.

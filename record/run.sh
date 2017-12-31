@@ -3,6 +3,8 @@
 # run.sh - shell script to run car <-> Autom system
 #
 # to be run at startup on dedicated connected computer
+#
+# by dayt0n 2017
 
 counter=0
 cd $(dirname $0)

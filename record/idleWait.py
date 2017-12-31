@@ -1,3 +1,7 @@
+# idleWait.py - allow grace period after engine shutdown incase of quick car restart
+#
+# by dayt0n 2017
+#
 import os
 import sys
 from pyvit import can

@@ -1,3 +1,7 @@
+# getData.py - record video and CAN bus data from a supported vehicle
+#
+# by dayt0n 2017
+#
 import os
 import sys
 import getpass
