@@ -235,13 +235,13 @@ while not end:
 	print("Writing to new CAN file...")
 	for i in range(newIterations,CANstopWrite):
 		newFile.write(CANlines[i]) # write revalvent bit
-
 	os.remove("working.csv")
 	newFile.close()
 	file.close()
 	# start backup process
 	#
 	# SFTP stuff
+	print("Initializing server connection")
 	cnopts = pysftp.CnOpts()
 	cnopts.hostkeys = None
 	if ifPassword:
