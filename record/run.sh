@@ -16,7 +16,7 @@ if [ -f record.log]; then
 		sed -n -E -e '/$oldDate/,$ p' record.log | sed '1 d'
 	fi
 fi
-echo $currentDate > record.log
+echo $currentDate >> record.log
 unamestr=`uname`
 echo "Allowing device time to be free"
 sleep 22 # wait for device to intialize
