@@ -21,9 +21,9 @@ unamestr=`uname`
 echo "Allowing device time to be free"
 sleep 22 # wait for device to intialize
 while true; do
-	python getData.py 2>&1 | tee -a record.log
-	python data_backup.py 2>&1 | tee -a record.log
-	python idleWait.py 2>&1 | tee -a record.log
+	stdbuf -oL python getData.py 2>&1 | tee -a record.log
+	stdbuf -oL python data_backup.py 2>&1 | tee -a record.log
+	stdbuf -oL python idleWait.py 2>&1 | tee -a record.log
 	rc=$?
 	if [ $rc != 0 ]; then
 		counter=$((counter+1))
