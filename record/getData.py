@@ -168,13 +168,18 @@ writer.writerow(['Time','ID','DLC','Data'])
 print("Collecting data in " + filename + "...")
 vidThread = myThread(latestDat,lastDat)
 vidThread.start() # start videoing
+engineOffCounter = 0
 while not end:
 	try:
 		frame = dev.recv()
 		writer.writerow([str(time.time()),frame.arb_id,frame.dlc,str(frame.data)])
 		if frame.arb_id == ENGINE_STATUS and frame.data[ENGINE_OFF_PLACE] == ENGINE_OFF: # engine has turned off, time to wrap things up...
-			end = True
-			break
+			engineOffCounter += 1
+			print("Detected engine off signal (%d/20) at %s" % (engineOffCounter,str(time.time()))) # added because in cold temperatures engine cuts on/off
+			# in the future, probably need to add a timing mechanism instead of a counter
+			if engineOffCounter == 20:
+				end = True
+				break
 	except (KeyboardInterrupt,SystemExit):
 		end = True
 		break
