@@ -8,8 +8,8 @@
 
 counter=0
 cd $(dirname $0)
-$currentDate=`date +%Y-%m-%d`
-$oldDate=`date -v -10d +%Y-%m-%d`
+currentDate=`date +%Y-%m-%d`
+oldDate=`date -v -10d +%Y-%m-%d`
 if [ -f record.log]; then
 	if grep -Fxq $oldDate record.log; then
 		# only keep logs of past 10 days
