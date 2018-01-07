@@ -8,7 +8,6 @@ from pyvit import can
 from pyvit.hw import cantact
 import time
 import subprocess
-import dbus
 
 if len(sys.argv) > 1:
 	if sys.argv[2] == "-h" or sys.argv[2] == "--help":
@@ -64,11 +63,7 @@ while True:
 		# shut down computer w/o root priviledges (ConsoleKit runs as root, so just need to hijack it)
 		if sys.platform == "linux" or sys.platform == "linux2":
 			dev.stop()
-			sys_bus = dbus.SystemBus()
-			ck_srv = sys_bus.get_object('org.freedesktop.ConsoleKit','/org/freedesktop/ConsoleKit/Manager')
-			ck_iface = dbus.Interface(ck_srv,'org.freedesktop.ConsoleKit.Manager')
-			stop_method = ck_iface.get_dbus_method("Stop")
-			stop_method()
+			subprocess.call(["sudo", "shutdown", "-h", "now"]) # you should use `sudo vidsudo` and set your username to use sudo w/o password
 			exit(0)
 		if sys.platform == "darwin":
 			dev.stop()
