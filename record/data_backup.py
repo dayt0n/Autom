@@ -48,7 +48,7 @@ def hasExternalServerStorage(srv):
 
 def canConnect():
 	try:
-		socket.setdefaulttimeout(3)
+		socket.setdefaulttimeout(5)
 		socket.socket(socket.AF_INET,socket.SOCK_STREAM).connect((server,portNum)) # only backup on home network
 		return True
 	except Exception as ex:
@@ -101,9 +101,12 @@ while not end:
 		for f in files:
 			if "data_" in f and f != "data_backup.py":
 				print("Found %s, attempting to backup...") % f
-				os.rename(f,"data_latest.txt")
-				foundFiles = True
-				break
+				if f != "data_.txt": # for some reason sometimes data files look like this and are empty
+					os.rename(f,"data_latest.txt")
+					foundFiles = True
+					break
+				else:
+					os.remove(f)
 		if not foundFiles:
 			print("No previous backups remaining, everything seems to be up to date. Exiting...")
 			break
@@ -292,4 +295,13 @@ while not end:
 	os.remove("data_latest.txt")
 	os.remove(CANfile)
 	srv.close()
+# final cleanup
+remainingFiles = os.listdir(".")
+if len(remainingFiles) != 0:
+	if len(remainingFiles) == 1:
+		if remainingFiles[0] != ".Trashes":
+			os.remove(remainingFiles[0])
+	else:
+		for f in remainingFiles:
+			os.remove(f)
 exit(0)
