@@ -50,19 +50,20 @@ dev.set_bitrate(500000)
 if sys.platform == "linux" or sys.platform == "linux2":
 	dev.ser.write('S6\r'.encode())
 dev.start()
-minutes = 0
+delay = 0
 while True:
 	frame = dev.recv()
 	if frame.arb_id == 0xC9 and frame.data[0] != 0x0:
 		print("Engine started, beginning data connection")
 		break
-	elif frame.arb_id == 0xC9 and frame.data[0] == 0x0 and minutes < 5:
-		minutes += 1
-		time.sleep(60) # sleep for two minutes as not to plague the car with requests
-	elif frame.arb_id == 0xC9 and frame.data[0] == 0x0 and minutes >= 5:
-		# shut down computer w/o root priviledges (ConsoleKit runs as root, so just need to hijack it)
+	elif frame.arb_id == 0xC9 and frame.data[0] == 0x0 and delay < 5:
+		delay += 1
+		print("Engine still off (%d/5)" % delay)
+		time.sleep(5) # sleep for 5 seconds as not to plague the car with requests
+	elif frame.arb_id == 0xC9 and frame.data[0] == 0x0 and delay >= 5:
 		if sys.platform == "linux" or sys.platform == "linux2":
 			dev.stop()
+			print("Attempting to shutdown...")
 			subprocess.call(["sudo", "shutdown", "-h", "now"]) # you should use `sudo vidsudo` and set your username to use sudo w/o password
 			exit(0)
 		if sys.platform == "darwin":
