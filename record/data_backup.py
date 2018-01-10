@@ -48,7 +48,7 @@ def hasExternalServerStorage(srv):
 
 def canConnect():
 	try:
-		socket.setdefaulttimeout(5)
+		socket.setdefaulttimeout(3)
 		socket.socket(socket.AF_INET,socket.SOCK_STREAM).connect((server,portNum)) # only backup on home network
 		return True
 	except Exception as ex:
@@ -90,7 +90,7 @@ while not end:
 			print("Connection no where near by, quitting...")
 			exit(0)
 		print("Unable to find backup server, check internet connection. Retrying...")
-		time.sleep(3)
+		time.sleep(5)
 		connectTimeout += 1
 		continue
 	if not os.path.isfile("data_latest.txt"): # check for past unbacked up files

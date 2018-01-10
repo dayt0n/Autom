@@ -52,7 +52,12 @@ if sys.platform == "linux" or sys.platform == "linux2":
 dev.start()
 delay = 0
 while True:
-	frame = dev.recv()
+	try:
+		frame = dev.recv()
+	except:
+		print("CAN data read failed, attempting to shut down")
+		subprocess.call(["sudo", "shutdown", "-h", "now"])
+		exit(0)
 	if frame.arb_id == 0xC9 and frame.data[0] != 0x0:
 		print("Engine started, beginning data connection")
 		break
