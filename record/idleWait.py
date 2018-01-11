@@ -51,7 +51,14 @@ if sys.platform == "linux" or sys.platform == "linux2":
 	dev.ser.write('S6\r'.encode())
 dev.start()
 delay = 0
+canEngineStillGoing = False
 while True:
+	startTime = time.time()
+	if time.time() > (startTime + 2) and not canEngineStillGoing: # engine stops sending out messages after a while
+		# engine also sends multiple messages per second, so if there are none in two seconds, that means it has officially stopped responding
+		print("Engine no longer sending out messages on the CAN bus, shutting down...")
+		subprocess.call(["sudo", "shutdown", "-h", "now"])
+		exit(0)
 	try:
 		frame = dev.recv()
 	except:
@@ -62,6 +69,7 @@ while True:
 		print("Engine started, beginning data connection")
 		break
 	elif frame.arb_id == 0xC9 and frame.data[0] == 0x0 and delay < 5:
+		canEngineStillGoing = True
 		delay += 1
 		print("Engine still off (%d/5)" % delay)
 		time.sleep(5) # sleep for 5 seconds as not to plague the car with requests
