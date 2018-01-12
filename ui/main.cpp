@@ -7,11 +7,35 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <sys/time.h>
+#include <spawn.h>
+#include <signal.h>
 
 using namespace std;
 using namespace cv;
 
 //string genCANDisplay(string label,int ID,)
+
+extern char **environ;
+void run_cmd(string cmd)
+{
+	pid_t pid;
+	char *argv[] = {(char*)"sh", (char*)"-c", (char*)cmd.c_str(), NULL};
+	int status;
+	status = posix_spawn(&pid, "/bin/sh", NULL, NULL, argv, environ);
+	if (status == 0) {
+		if (waitpid(pid, &status, 0) != -1) {
+		} else {
+			perror("waitpid");
+		}
+	} else {
+		printf("posix_spawn: %s\n", strerror(status));
+	}
+}
+
+void bunzip(string from, string to) { // I apologize for this, no other bz2 decompression method would work :(
+	string cmd = "python decompress.py " + from + " " + to;
+	run_cmd(cmd);
+}
 
 vector<double> getTimesforID(int IDtoFind,vector<int> IDs, vector<double> times,int length,int startTime) {
 	vector<double> time;
@@ -59,8 +83,13 @@ int main(int argc, char* argv[]) {
 	}
 	myfile.close();
 	string CANfile = dataDir + lines[1];
-
-	ifstream CANcsv(CANfile);
+	string decompressedCAN = dataDir + string("decompressed.csv");
+	printf("Decompressing CAN data (this may take a while)...\n");
+	ifstream src(CANfile,ios::binary); // copy CAN data
+	ofstream dst(decompressedCAN,ios::binary);
+	dst << src.rdbuf();
+	bunzip(CANfile,decompressedCAN); // decompress bz2
+	ifstream CANcsv(decompressedCAN);
 	vector<double> CANtime;
 	vector<int> ID;
 	vector <int> DLC;
@@ -132,7 +161,7 @@ int main(int argc, char* argv[]) {
 		seconds = ((thisTime/1000) % 3600) % 60;
 		msecs = thisTime - ((hours * 3600 * 1000) + (minutes * 60 * 1000) + (seconds * 1000));
 		timer = itoa(hours) + string(":") + itoa(minutes) + string(":") + itoa(seconds) + "." + msectoa(msecs);
-		if(time + 80 >= foundTimes[0])
+		//if(foundTimes[0] >= )
 		putText(frame,timer,Point(8,25),CV_FONT_HERSHEY_SIMPLEX,1,Scalar(255,100,255),2);
 		imshow(window_name,frame);
 		if (waitKey(1000/fps) == 27) {
@@ -140,5 +169,7 @@ int main(int argc, char* argv[]) {
 			break;
 		}
 	}
+	// cleanup
+	remove(decompressedCAN.c_str());
 	return 0;
 }
