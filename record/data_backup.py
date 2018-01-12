@@ -303,5 +303,6 @@ if len(remainingFiles) != 0:
 			os.remove(remainingFiles[0])
 	else:
 		for f in remainingFiles:
-			os.remove(f)
+			if f != ".Trashes":
+				os.remove(f)
 exit(0)
