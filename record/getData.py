@@ -18,6 +18,10 @@ import configparser
 
 end = False
 
+def get_image(camera):
+	retval, im = camera.read()
+	return im
+
 def hasExternalStorage():
 	login = getpass.getuser()
 	medias = os.listdir("/media/"+login+"/")
@@ -40,6 +44,9 @@ def vision(datfile,lastDat):
 	fourcc = cv2.VideoWriter_fourcc('m','p','4','v')
 	out = cv2.VideoWriter('output.m4v',fourcc,15.0,(frame_width,frame_height)) #15 fps
 	datfile.write(str(time.time()) + "\n") # write begin time
+	print("Adjusting to light levels...") # attempt to fix really, really fast videos
+	for i in xrange(30):
+		temp = get_image()
 	print("Started video service")
 	while(vc.isOpened()):
 		if end == True:

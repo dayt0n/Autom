@@ -2,7 +2,5 @@
 *.csv
 *.m4v
 *.zip
-uniqueIDs
-ids
 .DS_Store
 ui/automui
