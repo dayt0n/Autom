@@ -84,4 +84,5 @@ while True:
 			subprocess.call(['osascript','-e','tell app "system events" to shut down'])
 			exit(0)
 dev.stop()
+time.sleep(20) # we don't want to connect/disconnect too fast or else we will get a lot of error messages, possibly disabling the vehicle
 exit(0)
