@@ -13,7 +13,111 @@
 using namespace std;
 using namespace cv;
 
-//string genCANDisplay(string label,int ID,)
+string genCANDisplay(string dataStr,vector<int>bits,string label,string units,bool areBitsCombined = FALSE,bool doesHexMatter = FALSE,bool shouldDoMath = FALSE,int op = 0,int coefficient = 0) {
+	/* op = operator
+
+		Available operator values
+		0 = nothing
+		1 = add
+		2 = subtract
+		3 = multiply
+		4 = divide
+		5 = percent, coefficient being the maximum value
+	*/
+	string result;
+	unsigned int finalBits = 0;
+	dataStr.erase(0,2); // remove leading space and [ charachter
+	dataStr.erase(dataStr.size()-1); // remove last ]
+	dataStr.erase(remove_if(dataStr.begin(),dataStr.end(),::isspace),dataStr.end()); // remove spaces
+	vector<int> data;
+	stringstream ss(dataStr);
+	string tok;
+	while(getline(ss,tok,','))
+		data.push_back(stoi(tok));
+	if (bits.size() > 1) {
+		if(areBitsCombined) {
+			// combine bits
+			if(doesHexMatter) {
+				// assuming to put them in the order received
+				if(bits.size() > 4) {
+					printf("No implementation for combining more than 4 hex bits just yet\n");
+					return NULL;
+				} else if(bits.size() == 4)
+					finalBits = (data[bits[0]]<<24) | (data[bits[1]]<<16) | (data[bits[2]]<<8) | data[bits[3]];
+				else if(bits.size() == 3)
+					finalBits = (data[bits[0]]<<16) | (data[bits[1]]<<8) | data[bits[2]];
+				else if(bits.size() == 2) {
+					finalBits = (data[bits[0]]<<8) | data[bits[1]];
+				} else {
+					printf("Size error\n");
+					return NULL;
+				}
+			} else {
+				for(int i = 0; i < bits.size(); i++)
+					finalBits += data[bits[i]];
+			}
+		} else {
+			printf("we're going to need more information...\n");
+			return NULL;
+		}
+	} else {
+		finalBits = data[bits[0]];
+	}
+	// now we have finalBits
+	if(shouldDoMath) {
+		switch(op) {
+			case 0:
+				printf("shouldDoMath should be set to false if you plan to do no transformation\n");
+				break;
+			case 1:
+				finalBits += coefficient;
+				break;
+			case 2:
+				finalBits -= coefficient;
+				break;
+			case 3:
+				finalBits *= coefficient;
+				break;
+			case 4:
+				finalBits /= coefficient;
+				break;
+			case 5:
+				finalBits = 100 * (finalBits / coefficient);
+				break;
+			default:
+				printf("Invalid operator, doing nothing\n");
+				break;
+		}
+	}
+	result = label + ": " + to_string(finalBits) + " " + units;
+	return result;
+}
+
+/* THIS PART NOT EXACTLY WORKING, MAKES EVERYTHING GO VERY SLOWLY */
+string modifyCANDisplayString(int &CANcount,int frameCount,int timeForFrame,vector<double> foundTimes,vector<int>foundPlaces,vector<string> data,vector<int>bits,string label,string units,bool areBitsCombined = FALSE,bool doesHexMatter = FALSE,bool shouldDoMath = FALSE,int op = 0,int coefficient = 0) {
+	string text;
+	double thisFrame = (frameCount * timeForFrame);
+	double nextFrame = ((frameCount + 1) * timeForFrame);
+	if (foundTimes[CANcount] < thisFrame) {
+		while(CANcount < thisFrame) {
+			CANcount++;
+			printf("LOTS OF STUFF\n");
+		}
+	}
+	if (CANcount > (data.size() - 2)) {
+		printf("ERROR: OUT OF CAN LENGTH\n");
+	}
+	if(foundTimes[CANcount] >= thisFrame) {
+		if (foundTimes[CANcount] < nextFrame) {
+			/* do stuff with forming CAN string here */
+			printf("%s\n",data[foundPlaces[CANcount]].c_str());
+			text = genCANDisplay(data[foundPlaces[CANcount]],bits,label,units,areBitsCombined,doesHexMatter,shouldDoMath,4,100);
+			/* end CAN string forming */
+			CANcount++;
+		}
+	}
+	return text;
+}
 
 extern char **environ;
 void run_cmd(string cmd)
@@ -37,7 +141,7 @@ void bunzip(string from, string to) { // I apologize for this, no other bz2 deco
 	run_cmd(cmd);
 }
 
-vector<double> getTimesforID(int IDtoFind,vector<int> IDs, vector<double> times,int length,int startTime) {
+vector<double> getTimesForID(int IDtoFind,vector<int> IDs, vector<double> times,int length,int startTime) {
 	vector<double> time;
 	for(int i = 0; i <= length; i++) { // get count
 		if(IDs[i] == IDtoFind) {
@@ -47,6 +151,15 @@ vector<double> getTimesforID(int IDtoFind,vector<int> IDs, vector<double> times,
 	return time;
 }
 
+vector<int> getPlacesForID(int IDtoFind,vector<int> IDs,int length,int startTime) {
+	vector<int> places;
+	for(int i = 0; i <= length; i++) { // get count
+		if(IDs[i] == IDtoFind) {
+			places.push_back(i);
+		}
+	}
+	return places;
+}
 string itoa(int n) {
 	char str[15];
 	String string;
@@ -63,6 +176,15 @@ string msectoa(int n) {
 }
 
 int main(int argc, char* argv[]) {
+	string times, IDs, DLCs, datas, descriptor, now, timer, line, speedText;
+	vector<int> speedBitData = {0,1}; // data for speed is located in data packet for ID 0x3E9 in the first two bytes
+	vector<double> CANtime;
+	vector<int> ID;
+	vector <int> DLC;
+	vector<string> data;
+	vector<string> lines;
+	int hours, minutes, seconds, msecs, lineCount, lineNum, frameCount, CANcount = 0;
+	double thisFrame, nextFrame = 0.0;
 	if(argc < 2) {
 		printf("Incorrect usage\nusage: %s [data directory]\n",argv[0]);
 		return -1;
@@ -73,15 +195,16 @@ int main(int argc, char* argv[]) {
 	}
 	string vidFile = dataDir + string("output.m4v");
 	string dataFile = dataDir + string("data_latest.txt");
-	string line;
-	int lineCount = 0;
 	ifstream myfile(dataFile);
-	vector<string> lines;
 	while(!myfile.eof()) {
 		getline(myfile,line);
 		lines.push_back(line);
 	}
 	myfile.close();
+	double start = atof(lines[2].c_str());
+	double end = atof(lines[3].c_str());
+	double length = end - start; // all time is in seconds
+
 	string CANfile = dataDir + lines[1];
 	string decompressedCAN = dataDir + string("decompressed.csv");
 	printf("Decompressing CAN data (this may take a while)...\n");
@@ -90,16 +213,6 @@ int main(int argc, char* argv[]) {
 	dst << src.rdbuf();
 	bunzip(CANfile,decompressedCAN); // decompress bz2
 	ifstream CANcsv(decompressedCAN);
-	vector<double> CANtime;
-	vector<int> ID;
-	vector <int> DLC;
-	vector<string> data;
-	string times;
-	string IDs;
-	string DLCs;
-	string datas;
-	string descriptor;
-	int csvLength = 0;
 	printf("Processing %s...\n",CANfile.c_str());
 	getline(CANcsv,descriptor,'\n'); // get through first line
 	while(!CANcsv.eof()) { // read CSV file
@@ -111,19 +224,16 @@ int main(int argc, char* argv[]) {
 		DLC.push_back(atoi(DLCs.c_str()));
 		getline(CANcsv,datas,'\n');
 		data.push_back(datas);
-		csvLength++;
 	}
-	csvLength -= 2;
+	int csvLength = (CANtime.size() - 2);
 	CANcsv.close();
-	double start = atof(lines[2].c_str());
-	double end = atof(lines[3].c_str());
+
 	if(CANtime[0] != start || CANtime[csvLength] != end) {
 		printf("Timing mismatch, please consult changes made from data_backup.py\n");
 		return -1;
 	}
-	vector<double> foundTimes = getTimesforID(0x3E9,ID,CANtime,csvLength,start);
-	printf("first time for ID %d: %f\n",0x3E9,foundTimes[0]);
-	double length = end - start; // all time is in seconds
+	vector<double> foundTimes = getTimesForID(0x3E9,ID,CANtime,csvLength,start); // speed ID for chevy volt is 0x3E9
+	vector<int> foundPlaces = getPlacesForID(0x3E9,ID,csvLength,start);
 	printf("length: %f minutes\n",(length/60));
 	VideoCapture cap(vidFile);
 	if (cap.isOpened() == false) {
@@ -131,21 +241,16 @@ int main(int argc, char* argv[]) {
 		return -1;
 	}
 	double fps = cap.get(CV_CAP_PROP_FPS); // dynamic fps adjustment for different cameras
-	double timeForFrame = 1.0 / fps;
+	int timeForFrame = 1000 / fps;
 	printf("Playing at %f frames per second\n",fps);
 	string window_name = "Autom Player";
-	namedWindow(window_name,WINDOW_NORMAL);
+	namedWindow(window_name,CV_WINDOW_NORMAL);
 	struct timeval tp;
 	gettimeofday(&tp,NULL);
 	long int initialTime = tp.tv_sec * 1000 + tp.tv_usec / 1000;
-	string now;
 	long int thisTime = 0;
-	int hours = 0;
-	int minutes = 0;
-	int seconds = 0;
-	int msecs = 0;
-	string timer;
 	while(true) {
+		frameCount++;
 		Mat frame;
 		bool bSuccess = cap.read(frame);
 		if(bSuccess == false) {
@@ -161,7 +266,27 @@ int main(int argc, char* argv[]) {
 		seconds = ((thisTime/1000) % 3600) % 60;
 		msecs = thisTime - ((hours * 3600 * 1000) + (minutes * 60 * 1000) + (seconds * 1000));
 		timer = itoa(hours) + string(":") + itoa(minutes) + string(":") + itoa(seconds) + "." + msectoa(msecs);
-		//if(foundTimes[0] >= )
+		
+		thisFrame = (frameCount * timeForFrame);
+		nextFrame = ((frameCount + 1) * timeForFrame);
+		if ((foundTimes[CANcount] * 1000) < thisFrame) { // make sure no CAN messages are left behind
+			CANcount++; // instead of this should have an algorithm to get average time between messages and then add to CANcount accordingly
+		}
+		if (CANcount > csvLength) {
+			printf("ERROR: OUT OF CAN LENGTH\n");
+			break;
+		}
+		if((foundTimes[CANcount] * 1000) >= thisFrame) {
+			if ((foundTimes[CANcount] * 1000) < nextFrame) {
+				// do stuff with forming CAN string here 
+				printf("%s\n",data[foundPlaces[CANcount]].c_str()); // for some reason it will only work if I printf the data I want to display, no idea why
+				speedText = genCANDisplay(data[foundPlaces[CANcount]],speedBitData,"Speed","mph",TRUE,TRUE,TRUE,4,100);
+				// end CAN string forming 
+				CANcount++; // let program know to wait for the next one
+			}
+		}
+		//speedText = modifyCANDisplayString(CANcount,frameCount,timeForFrame,foundTimes,foundPlaces,data,speedBitData,"Speed","mph",TRUE,TRUE,TRUE,4,100);
+		putText(frame,speedText,Point(250,25),CV_FONT_HERSHEY_SIMPLEX,1,Scalar(255,0,0),2);
 		putText(frame,timer,Point(8,25),CV_FONT_HERSHEY_SIMPLEX,1,Scalar(255,100,255),2);
 		imshow(window_name,frame);
 		if (waitKey(1000/fps) == 27) {
