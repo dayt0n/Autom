@@ -46,7 +46,7 @@ def vision(datfile,lastDat):
 	datfile.write(str(time.time()) + "\n") # write begin time
 	print("Adjusting to light levels...") # attempt to fix really, really fast videos
 	for i in xrange(30):
-		temp = get_image()
+		temp = get_image(vc)
 	print("Started video service")
 	while(vc.isOpened()):
 		if end == True:
@@ -63,10 +63,10 @@ def vision(datfile,lastDat):
 				break
 		else:
 			continue
+	datfile.write(str(time.time()) + "\n") # write end time
 	vc.release()
 	out.release()
 	cv2.destroyWindow("visiond")
-	datfile.write(str(time.time()) + "\n") # write end time
 
 class myThread(threading.Thread):
 	def __init__(self,datfile,lastDat):
