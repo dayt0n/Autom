@@ -29,7 +29,7 @@ string genCANDisplay(string dataStr,vector<int>bits,string label,string units,bo
 	dataStr.erase(0,2); // remove leading space and [ charachter
 	dataStr.erase(dataStr.size()-1); // remove last ]
 	dataStr.erase(remove_if(dataStr.begin(),dataStr.end(),::isspace),dataStr.end()); // remove spaces
-	vector<int> data;
+	vector<unsigned long> data;
 	stringstream ss(dataStr);
 	string tok;
 	while(getline(ss,tok,','))
@@ -62,7 +62,7 @@ string genCANDisplay(string dataStr,vector<int>bits,string label,string units,bo
 						finalBits = (data[bits[0]]<<8) | data[bits[1]];
 						break;
 					default:
-						printf("bits.size() error\n")
+						printf("bits.size() error\n");
 						return NULL;
 						break;
 				}
@@ -283,21 +283,19 @@ int main(int argc, char* argv[]) {
 		
 		thisFrame = (frameCount * timeForFrame);
 		nextFrame = ((frameCount + 1) * timeForFrame);
-		if ((foundTimes[CANcount] * 1000) < thisFrame) { // make sure no CAN messages are left behind
+		// make sure no CAN messages are left behind
+		while(int (foundTimes[CANcount] * 1000) < thisFrame) // must convert to int as to not have video/data lag
 			CANcount++; // instead of this should have an algorithm to get average time between messages and then add to CANcount accordingly
-		}
 		if (CANcount > csvLength) {
 			printf("ERROR: OUT OF CAN LENGTH\n");
 			break;
 		}
-		if((foundTimes[CANcount] * 1000) >= thisFrame) {
-			if ((foundTimes[CANcount] * 1000) < nextFrame) {
-				// do stuff with forming CAN string here 
-				printf("%s\n",data[foundPlaces[CANcount]].c_str()); // for some reason it will only work if I printf the data I want to display, no idea why
-				speedText = genCANDisplay(data[foundPlaces[CANcount]],speedBitData,"Speed","mph",TRUE,TRUE,TRUE,4,100);
-				// end CAN string forming 
-				CANcount++; // let program know to wait for the next one
-			}
+		if((int (foundTimes[CANcount] * 1000) >= thisFrame) && (int (foundTimes[CANcount] * 1000) < nextFrame)) {
+			// do stuff with forming CAN string here 
+			printf("%s\n",data[foundPlaces[CANcount]].c_str()); // for some reason it will only work if I printf the data I want to display, no idea why
+			speedText = genCANDisplay(data[foundPlaces[CANcount]],speedBitData,"Speed","mph",TRUE,TRUE,TRUE,4,100);
+			// end CAN string forming 
+			CANcount++; // let program know to wait for the next one
 		}
 		//speedText = modifyCANDisplayString(CANcount,frameCount,timeForFrame,foundTimes,foundPlaces,data,speedBitData,"Speed","mph",TRUE,TRUE,TRUE,4,100);
 		putText(frame,speedText,Point(250,25),CV_FONT_HERSHEY_SIMPLEX,1,Scalar(255,0,0),2);
