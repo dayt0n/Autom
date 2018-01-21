@@ -39,18 +39,32 @@ string genCANDisplay(string dataStr,vector<int>bits,string label,string units,bo
 			// combine bits
 			if(doesHexMatter) {
 				// assuming to put them in the order received
-				if(bits.size() > 4) {
-					printf("No implementation for combining more than 4 hex bits just yet\n");
-					return NULL;
-				} else if(bits.size() == 4)
-					finalBits = (data[bits[0]]<<24) | (data[bits[1]]<<16) | (data[bits[2]]<<8) | data[bits[3]];
-				else if(bits.size() == 3)
-					finalBits = (data[bits[0]]<<16) | (data[bits[1]]<<8) | data[bits[2]];
-				else if(bits.size() == 2) {
-					finalBits = (data[bits[0]]<<8) | data[bits[1]];
-				} else {
-					printf("Size error\n");
-					return NULL;
+				switch(bits.size()) {
+					case 8:
+						finalBits = (data[bits[0]]<<56) | (data[bits[1]]<<48) | (data[bits[2]]<<40) | (data[bits[3]]<<32) | (data[bits[4]]<<24) | (data[bits[5]]<<16) | (data[bits[6]]<<8) | data[bits[7]];
+						break;
+					case 7:
+						finalBits = (data[bits[0]]<<48) | (data[bits[1]]<<40) | (data[bits[2]]<<32) | (data[bits[3]]<<24) | (data[bits[4]]<<16) | (data[bits[5]]<<8) | data[bits[6]];
+						break;
+					case 6:
+						finalBits = (data[bits[0]]<<40) | (data[bits[1]]<<32) | (data[bits[2]]<<24) | (data[bits[3]]<<16) | (data[bits[4]]<<8) | data[bits[5]];
+						break;
+					case 5:
+						finalBits = (data[bits[0]]<<32) | (data[bits[1]]<<24) | (data[bits[2]]<<16) | (data[bits[3]]<<8) | data[bits[4]];
+						break;
+					case 4:
+						finalBits = (data[bits[0]]<<24) | (data[bits[1]]<<16) | (data[bits[2]]<<8) | data[bits[3]];
+						break;
+					case 3:
+						finalBits = (data[bits[0]]<<16) | (data[bits[1]]<<8) | data[bits[2]];
+						break;
+					case 2:
+						finalBits = (data[bits[0]]<<8) | data[bits[1]];
+						break;
+					default:
+						printf("bits.size() error\n")
+						return NULL;
+						break;
 				}
 			} else {
 				for(int i = 0; i < bits.size(); i++)
