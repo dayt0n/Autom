@@ -48,8 +48,18 @@ if not dev:
 	exit(-1)
 dev.set_bitrate(500000)
 if sys.platform == "linux" or sys.platform == "linux2":
-	dev.ser.write('S6\r'.encode())
-dev.start()
+	try:
+		dev.ser.write('S6\r'.encode())
+	except:
+		print("Cannot write to bus, shutting down...")
+		subprocess.call(["sudo", "shutdown", "-h", "now"])
+		exit(0)
+try:
+	dev.start()
+except:
+	print("Cannot start device, shutting down...")
+	subprocess.call(["sudo", "shutdown", "-h", "now"])
+	exit(0)
 delay = 0
 canEngineStillGoing = False
 while True:
