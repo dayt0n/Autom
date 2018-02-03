@@ -70,7 +70,7 @@ while True:
 		subprocess.call(["sudo", "shutdown", "-h", "now"])
 		exit(0)
 	try:
-		frame = dev.recv()
+		frame = dev.recv(timeout=1)
 	except:
 		print("CAN data read failed, attempting to shut down")
 		subprocess.call(["sudo", "shutdown", "-h", "now"])
