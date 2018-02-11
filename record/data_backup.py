@@ -46,7 +46,7 @@ def hasExternalServerStorage(srv):
 		else:
 			return False
 
-def canConnect():
+def canConnect(server,portNum):
 	try:
 		socket.setdefaulttimeout(3)
 		socket.socket(socket.AF_INET,socket.SOCK_STREAM).connect((server,portNum)) # only backup on home network
@@ -85,7 +85,7 @@ extStorage = hasExternalStorage()
 if extStorage:
 	os.chdir(extStorage)
 while not end:
-	if not canConnect():
+	if not canConnect(server,portNum):
 		if connectTimeout >= 40: # wait two minutes
 			print("Connection no where near by, quitting...")
 			exit(0)
