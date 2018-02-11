@@ -255,7 +255,7 @@ int main(int argc, char* argv[]) {
 		return -1;
 	}
 	double fps = cap.get(CV_CAP_PROP_FPS); // dynamic fps adjustment for different cameras
-	int timeForFrame = 1000 / fps;
+	int timeForFrame = 1000 / (int)fps;
 	printf("Playing at %f frames per second\n",fps);
 	string window_name = "Autom Player";
 	namedWindow(window_name,CV_WINDOW_NORMAL);
@@ -301,7 +301,7 @@ int main(int argc, char* argv[]) {
 		putText(frame,speedText,Point(250,25),CV_FONT_HERSHEY_SIMPLEX,1,Scalar(255,0,0),2);
 		putText(frame,timer,Point(8,25),CV_FONT_HERSHEY_SIMPLEX,1,Scalar(255,100,255),2);
 		imshow(window_name,frame);
-		if (waitKey(1000/fps) == 27) {
+		if (waitKey(timeForFrame) == 27) {
 			printf("Video stopped by user\n");
 			break;
 		}

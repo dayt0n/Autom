@@ -34,7 +34,13 @@ def vision(datfile,lastDat):
 	global end
 	cv2.namedWindow("visiond")
 	vc = cv2.VideoCapture(0)
-
+	fps = vc.get(cv2.CAP_PROP_FPS)
+	if not fps:
+		print("Error getting fps, sticking with fifteen.")
+		fps = 15.0
+	else:
+		print("got fps: %d" % fps)
+	delay = int(1000 / (int(fps)))
 	frame_width = int(vc.get(3))
 	frame_height = int(vc.get(4))
 	if os.path.isfile("output.m4v"): # check for remnants of last video and handle it
@@ -42,11 +48,8 @@ def vision(datfile,lastDat):
 			firstLine = f.readline().rstrip()
 		os.rename("output.m4v","output_" + firstLine + ".m4v")
 	fourcc = cv2.VideoWriter_fourcc('m','p','4','v')
-	out = cv2.VideoWriter('output.m4v',fourcc,15.0,(frame_width,frame_height)) #15 fps
+	out = cv2.VideoWriter('output.m4v',fourcc,fps,(frame_width,frame_height))
 	datfile.write(str(time.time()) + "\n") # write begin time
-	print("Adjusting to light levels...") # attempt to fix really, really fast videos
-	for i in xrange(30):
-		temp = get_image(vc)
 	print("Started video service")
 	while(vc.isOpened()):
 		if end == True:
@@ -56,8 +59,7 @@ def vision(datfile,lastDat):
 			frame = cv2.resize(frame,(frame_width,frame_height))
 			out.write(frame)
 			cv2.imshow("visiond",frame)
-			rval,frame = vc.read()
-			key = cv2.waitKey(1)
+			key = cv2.waitKey(delay)
 			if key == 27:
 				end = True
 				break
