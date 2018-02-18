@@ -21,7 +21,7 @@ unamestr=`uname`
 echo "Allowing device time to be free"
 sleep 22 # wait for device to intialize
 echo "Applying video settings"
-v4l2-ctl -d /dev/video0 -c exposure_auto=1 -c exposure_absolute=156 --verbose
+v4l2-ctl -d /dev/video0 -c exposure_auto=1 -c exposure_absolute=10 --verbose
 while true; do
 	stdbuf -oL python getData.py 2>&1 | tee -a record.log
 	stdbuf -oL python data_backup.py 2>&1 | tee -a record.log
