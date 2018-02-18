@@ -36,8 +36,8 @@ def vision(datfile,lastDat):
 	vc = cv2.VideoCapture(0)
 	fps = vc.get(cv2.CAP_PROP_FPS)
 	#vc.set(cv2.CAP_PROP_GAIN,0) # attempt to fix nighttime issues
-	vc.set(cv2.CAP_PROP_AUTO_EXPOSURE,False) # second attempt for nighttime fixes
-	vc.set(cv2.CAP_PROP_EXPOSURE,-100)
+	#vc.set(cv2.CAP_PROP_AUTO_EXPOSURE,False) # second attempt for nighttime fixes
+	#vc.set(cv2.CAP_PROP_EXPOSURE,-100)
 	if not fps:
 		print("Error getting fps, sticking with fifteen.")
 		fps = 15.0
