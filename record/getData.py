@@ -54,7 +54,7 @@ def vision(datfile,lastDat):
 			firstLine = f.readline().rstrip()
 		os.rename("output.m4v","output_" + firstLine + ".m4v")
 	if os.path.isfile("frame_md.txt"):
-		os.rename("frame_md.txt","frame_md_" + firstLine _ ".txt")
+		os.rename("frame_md.txt","frame_md_" + firstLine + ".txt")
 	fourcc = cv2.VideoWriter_fourcc('m','p','4','v')
 	out = cv2.VideoWriter('output.m4v',fourcc,fps,(frame_width,frame_height))
 	metadata = bz2.BZ2File("frame_md.txt","w") # bz2 compression cause this sucker is gonna be huge otherwise
