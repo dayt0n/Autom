@@ -301,11 +301,7 @@ while not end:
 # final cleanup
 remainingFiles = os.listdir(".")
 if len(remainingFiles) != 0:
-	if len(remainingFiles) == 1:
-		if remainingFiles[0] != ".Trashes":
-			os.remove(remainingFiles[0])
-	else:
-		for f in remainingFiles:
-			if f != ".Trashes":
-				os.remove(f)
+	for f in remainingFiles:
+		if ".csv" in f or ".txt" in f or ".m4v" in f:
+			os.remove(f)
 exit(0)
