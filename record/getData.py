@@ -37,7 +37,7 @@ def vision(datfile,lastDat):
 	global end
 	cv2.namedWindow("visiond")
 	vc = cv2.VideoCapture(0)
-	fps = vc.get(cv2.CAP_PROP_FPS)
+	fps = vc.get(5)
 	#vc.set(cv2.CAP_PROP_GAIN,0) # attempt to fix nighttime issues
 	#vc.set(cv2.CAP_PROP_AUTO_EXPOSURE,False) # second attempt for nighttime fixes
 	#vc.set(cv2.CAP_PROP_EXPOSURE,-100)
