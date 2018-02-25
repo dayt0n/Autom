@@ -53,8 +53,11 @@ def vision(datfile,lastDat):
 		with open(lastDat,"r") as f:
 			firstLine = f.readline().rstrip()
 		os.rename("output.m4v","output_" + firstLine + ".m4v")
+	if os.path.isfile("frame_md.txt"):
+		os.rename("frame_md.txt","frame_md_" + firstLine _ ".txt")
 	fourcc = cv2.VideoWriter_fourcc('m','p','4','v')
 	out = cv2.VideoWriter('output.m4v',fourcc,fps,(frame_width,frame_height))
+	metadata = bz2.BZ2File("frame_md.txt","w") # bz2 compression cause this sucker is gonna be huge otherwise
 	datfile.write(str(time.time()) + "\n") # write begin time
 	print("Started video service")
 	while(vc.isOpened()):
@@ -64,6 +67,7 @@ def vision(datfile,lastDat):
 		if rval == True:
 			frame = cv2.resize(frame,(frame_width,frame_height))
 			out.write(frame)
+			metadata.write(str(time.time()) + "\n") # write time of frame. this should help align data perfectly with video
 			cv2.imshow("visiond",frame)
 			key = cv2.waitKey(delay)
 			if key == 27:
@@ -74,6 +78,7 @@ def vision(datfile,lastDat):
 	datfile.write(str(time.time()) + "\n") # write end time
 	vc.release()
 	out.release()
+	metadata.close()
 	cv2.destroyWindow("visiond")
 
 class myThread(threading.Thread):

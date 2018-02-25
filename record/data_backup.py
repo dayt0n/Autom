@@ -123,6 +123,7 @@ while not end:
 	vidEnd = float(lines[3])
 	if not latest:
 		os.rename("output_" + CANtime + ".m4v","output.m4v")
+		os.rename("frame_md_" + CANtime + ".txt","frame_md.txt")
 	dat.close()
 	fileobj = open(CANfile,"rb")
 	signature = fileobj.read(4)
@@ -273,6 +274,7 @@ while not end:
 		print("zipping files")
 		currentZip.write("data_latest.txt")
 		currentZip.write("output.m4v")
+		currentZip.write("frame_md.txt")
 		currentZip.write(CANfile)
 	with srv.cd(serverCD):
 		print("uploading zip file")
@@ -290,12 +292,13 @@ while not end:
 			srv.remove(zipName)
 		os.rename("data_latest.txt","data_" + CANtime + ".txt")
 		os.rename("output.m4v","output_" + CANtime + ".m4v")
-
+		os.rename("frame_md.txt","frame_md_" + CANtime + ".txt")
 		continue
 	print("File size match, transfer success")
 	print("Cleaning up")
 	os.remove("output.m4v")
 	os.remove("data_latest.txt")
+	os.remove("frame_md.txt")
 	os.remove(CANfile)
 	srv.close()
 # final cleanup
