@@ -24,11 +24,14 @@ def get_image(camera):
 
 def hasExternalStorage():
 	login = getpass.getuser()
-	medias = os.listdir("/media/"+login+"/")
-	if len(medias) == 0:
-		return False
+	if os.path.isdir("/media/"+login+"/"):
+		medias = os.listdir("/media/"+login+"/")
+		if len(medias) == 0:
+			return False
+		else:
+			return str("/media/" + login + "/" + medias[0])
 	else:
-		return str("/media/" + login + "/" + medias[0])
+		return False
 
 def vision(datfile,lastDat):
 	global end

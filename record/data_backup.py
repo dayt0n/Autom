@@ -29,11 +29,14 @@ def changeLineInFile(fileLocation,lineNumber,string):
 
 def hasExternalStorage():
 	login = getpass.getuser()
-	medias = os.listdir("/media/"+login+"/")
-	if len(medias) == 0:
-		return False
+	if os.path.isdir("/media/"+login+"/"):
+		medias = os.listdir("/media/"+login+"/")
+		if len(medias) == 0:
+			return False
+		else:
+			return str("/media/" + login + "/" + medias[0])
 	else:
-		return str("/media/" + login + "/" + medias[0])
+		return False
 
 def hasExternalServerStorage(srv):
 	with srv.cd("/media/"):
