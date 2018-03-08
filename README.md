@@ -37,9 +37,9 @@ ssh-copy-id username@hostIP
 ```bash
 mkdir ~/backup/
 ```
-3. Specify the server IP, username, password, port number (default is 22 for SSH), and make sure `ifPassword = True` and set `sshPass` in [config.cfg](config.cfg).
+3. Specify the server IP, username, password, port number (default is 22 for SSH), and make sure `ifPassword = True` and set `sshPass` in [config.cfg](record/config.cfg).
 ### (Optional) For those using a private key
-  * Specify the server IP, username, private key location, port number, and make sure `ifPassword = False` in [config.cfg](config.cfg).
+  * Specify the server IP, username, private key location, port number, and make sure `ifPassword = False` in [config.cfg](record/config.cfg).
 4. On PC for car installation, clone a copy of Autom anywhere.
 5. Add `gnome-terminal -e "path/to/Autom/run.sh"` to startup applications on the car PC. If you are using Ubuntu, you can do this by `cd`'ing to the root directory of this project and executing the following command: 
 ```bash
