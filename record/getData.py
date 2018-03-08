@@ -37,10 +37,7 @@ def vision(datfile,lastDat):
 	global end
 	cv2.namedWindow("visiond")
 	vc = cv2.VideoCapture(0)
-	fps = vc.get(5)
-	#vc.set(cv2.CAP_PROP_GAIN,0) # attempt to fix nighttime issues
-	#vc.set(cv2.CAP_PROP_AUTO_EXPOSURE,False) # second attempt for nighttime fixes
-	#vc.set(cv2.CAP_PROP_EXPOSURE,-100)
+	fps = vc.get(cv2.CAP_PROP_FPS)
 	if not fps:
 		print("Error getting fps, sticking with fifteen.")
 		fps = 15.0
@@ -67,7 +64,7 @@ def vision(datfile,lastDat):
 		if rval == True:
 			frame = cv2.resize(frame,(frame_width,frame_height))
 			out.write(frame)
-			metadata.write(str(time.time()) + "\n") # write time of frame. this should help align data perfectly with video
+			metadata.write(str(time.time()) + "\n")# write time of frame. this should help align data perfectly with video
 			cv2.imshow("visiond",frame)
 			key = cv2.waitKey(delay)
 			if key == 27:
@@ -182,7 +179,7 @@ thisTime = thisTime.replace(":","-")
 latestDat.write(thisTime + "\n") # let backup service know start time
 filename = "CAN_" + thisTime + ".csv"
 latestDat.write(filename + "\n") # let backup service know latest file
-file = bz2.BZ2File(filename,"wb")
+file = bz2.BZ2File(filename,"wb") # use bz2 text compression since this file is gonna be huge
 writer = csv.writer(file,delimiter=",",quotechar=" ",quoting=csv.QUOTE_MINIMAL,lineterminator='\n')
 writer.writerow(['Time','ID','DLC','Data'])
 print("Collecting data in " + filename + "...")

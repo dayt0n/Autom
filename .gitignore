@@ -4,3 +4,6 @@
 *.zip
 .DS_Store
 ui/automui
+checksum_prediction/
+learn/
+*.png

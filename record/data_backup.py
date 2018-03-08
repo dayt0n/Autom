@@ -125,6 +125,24 @@ while not end:
 		os.rename("output_" + CANtime + ".m4v","output.m4v")
 		os.rename("frame_md_" + CANtime + ".txt","frame_md.txt")
 	dat.close()
+
+	# DECOMPRESS FRAME METADATA
+
+	fileobj = open("frame_md.txt","rb")
+	signature = fileobj.read(4)
+	fileobj.close()
+	if signature[:3] == b'BZh':
+		compressed = bz2.BZ2File(infile,"rb")
+		uncompressed = open("dec_frame_md.txt","wb");
+		rawbz2 = compressed.read()
+		uncompressed.write(rawbz2)
+		uncompressed.close()
+		compressed.close()
+		os.remove("frame_md.txt")
+		os.rename("dec_frame_md.txt","frame_md.txt")
+
+	# DECOMPRESS CAN DATA FILE
+
 	fileobj = open(CANfile,"rb")
 	signature = fileobj.read(4)
 	fileobj.close()

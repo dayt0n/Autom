@@ -103,7 +103,13 @@ string genCANDisplay(string dataStr,vector<int>bits,string label,string units,bo
 				break;
 		}
 	}
-	result = label + ": " + to_string(finalBits) + " " + units;
+	if (finalBits > 0x0 && finalBits < 0x1EC8) {
+		// this is a left turn
+		result = label + ": " + to_string(finalBits) + " " + "left";
+	} else {
+		finalBits = 0xFFFF - finalBits;
+		result = label + ": " + to_string(finalBits) + " " + "right";
+	}
 	return result;
 }
 
@@ -159,7 +165,7 @@ vector<double> getTimesForID(int IDtoFind,vector<int> IDs, vector<double> times,
 	vector<double> time;
 	for(int i = 0; i <= length; i++) { // get count
 		if(IDs[i] == IDtoFind) {
-			time.push_back(times[i] - startTime);
+			time.push_back((times[i] - startTime)*666.666666);
 		}
 	}
 	return time;
@@ -190,15 +196,14 @@ string msectoa(int n) {
 }
 
 int main(int argc, char* argv[]) {
-	string times, IDs, DLCs, datas, descriptor, now, timer, line, speedText;
-	vector<int> speedBitData = {0,1}; // data for speed is located in data packet for ID 0x3E9 in the first two bytes
+	string times, IDs, DLCs, datas, descriptor, now, line, speedText;
+	vector<int> bitData = {1,2}; // data for speed is located in data packet for ID 0x3E9 in the first two bytes
 	vector<double> CANtime;
 	vector<int> ID;
 	vector <int> DLC;
 	vector<string> data;
 	vector<string> lines;
 	int hours, minutes, seconds, msecs, lineCount, lineNum, frameCount, CANcount = 0;
-	double thisFrame, nextFrame = 0.0;
 	if(argc < 2) {
 		printf("Incorrect usage\nusage: %s [data directory]\n",argv[0]);
 		return -1;
@@ -246,8 +251,9 @@ int main(int argc, char* argv[]) {
 		printf("Timing mismatch, please consult changes made from data_backup.py\n");
 		return -1;
 	}
-	vector<double> foundTimes = getTimesForID(0x3E9,ID,CANtime,csvLength,start); // speed ID for chevy volt is 0x3E9
-	vector<int> foundPlaces = getPlacesForID(0x3E9,ID,csvLength,start);
+	vector<double> foundTimes = getTimesForID(0x1E5,ID,CANtime,csvLength,start); // speed ID for chevy volt is 0x3E9
+
+	vector<int> foundPlaces = getPlacesForID(0x1E5,ID,csvLength,start);
 	printf("length: %f minutes\n",(length/60));
 	VideoCapture cap(vidFile);
 	if (cap.isOpened() == false) {
@@ -255,53 +261,39 @@ int main(int argc, char* argv[]) {
 		return -1;
 	}
 	double fps = cap.get(CV_CAP_PROP_FPS); // dynamic fps adjustment for different cameras
-	int timeForFrame = 1000 / (int)fps;
-	printf("Playing at %f frames per second\n",fps);
+	double timeForFrame = 1000 / fps;
+	printf("Playing at %f|%f frames per second\n",fps,timeForFrame);
 	string window_name = "Autom Player";
 	namedWindow(window_name,CV_WINDOW_NORMAL);
-	struct timeval tp;
-	gettimeofday(&tp,NULL);
-	long int initialTime = tp.tv_sec * 1000 + tp.tv_usec / 1000;
-	long int thisTime = 0;
+	long int currentTime = 0;
 	while(true) {
-		frameCount++;
 		Mat frame;
 		bool bSuccess = cap.read(frame);
 		if(bSuccess == false) {
-			printf("Found End of video\n");
+			printf("End of video\n");
 			break;
 		}
-		// next: do subtraction on CANtimes to get realtime data, divide by frames per second, and you know what to do from there
-		gettimeofday(&tp,NULL);
-		thisTime = (tp.tv_sec * 1000 + tp.tv_usec / 1000) - initialTime;
-		now = itoa(thisTime);
-		hours = (thisTime/1000)/3600;
-		minutes = ((thisTime/1000) % 3600)/60;
-		seconds = ((thisTime/1000) % 3600) % 60;
-		msecs = thisTime - ((hours * 3600 * 1000) + (minutes * 60 * 1000) + (seconds * 1000));
-		timer = itoa(hours) + string(":") + itoa(minutes) + string(":") + itoa(seconds) + "." + msectoa(msecs);
-		
-		thisFrame = (frameCount * timeForFrame);
-		nextFrame = ((frameCount + 1) * timeForFrame);
+		currentTime = cap.get(CV_CAP_PROP_POS_MSEC);
+		frameCount = cap.get(CV_CAP_PROP_POS_FRAMES);
 		// make sure no CAN messages are left behind
-		while(int (foundTimes[CANcount] * 1000) < thisFrame) // must convert to int as to not have video/data lag
+		while(foundTimes[CANcount] < currentTime) // must convert to int as to not have video/data lag
 			CANcount++; // instead of this should have an algorithm to get average time between messages and then add to CANcount accordingly
 		if (CANcount > csvLength) {
 			printf("ERROR: OUT OF CAN LENGTH\n");
 			break;
 		}
-		if((int (foundTimes[CANcount] * 1000) >= thisFrame) && (int (foundTimes[CANcount] * 1000) < nextFrame)) {
+		if(currentTime <= foundTimes[CANcount] && foundTimes[CANcount] < (currentTime + (int)timeForFrame)) {
 			// do stuff with forming CAN string here 
-			printf("%s\n",data[foundPlaces[CANcount]].c_str()); // for some reason it will only work if I printf the data I want to display, no idea why
-			speedText = genCANDisplay(data[foundPlaces[CANcount]],speedBitData,"Speed","mph",TRUE,TRUE,TRUE,4,100);
+			printf("foundTimes[%d]: %f | currentTime: %ld | nextFrame: %ld\n",CANcount,foundTimes[CANcount],currentTime,currentTime + (int)timeForFrame);
+			speedText = genCANDisplay(data[foundPlaces[CANcount]],bitData,"Steer","steer units",TRUE,TRUE);
 			// end CAN string forming 
 			CANcount++; // let program know to wait for the next one
 		}
-		//speedText = modifyCANDisplayString(CANcount,frameCount,timeForFrame,foundTimes,foundPlaces,data,speedBitData,"Speed","mph",TRUE,TRUE,TRUE,4,100);
+		//speedText = modifyCANDisplayString(CANcount,frameCount,timeForFrame,foundTimes,foundPlaces,data,bitData,"Speed","mph",TRUE,TRUE,TRUE,4,100);
 		putText(frame,speedText,Point(250,25),CV_FONT_HERSHEY_SIMPLEX,1,Scalar(255,0,0),2);
-		putText(frame,timer,Point(8,25),CV_FONT_HERSHEY_SIMPLEX,1,Scalar(255,100,255),2);
+		putText(frame,currentTime,Point(8,25),CV_FONT_HERSHEY_SIMPLEX,1,Scalar(255,100,255),2);
 		imshow(window_name,frame);
-		if (waitKey(timeForFrame) == 27) {
+		if (waitKey((int)timeForFrame) == 27) {
 			printf("Video stopped by user\n");
 			break;
 		}
