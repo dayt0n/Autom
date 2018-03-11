@@ -19,7 +19,7 @@ def canConnect(server,portNum):
 
 def checkForUpdates():
 	print("Checking for updates...")
-	if not canConnect(8.8.8.8,53):
+	if not canConnect("8.8.8.8",53): # google DNS
 		print("Unable to connect to the internet")
 		return False
 	os.chdir("..")

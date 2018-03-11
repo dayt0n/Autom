@@ -132,7 +132,7 @@ while not end:
 	signature = fileobj.read(4)
 	fileobj.close()
 	if signature[:3] == b'BZh':
-		compressed = bz2.BZ2File(infile,"rb")
+		compressed = bz2.BZ2File("frame_md.txt","rb")
 		uncompressed = open("dec_frame_md.txt","wb");
 		rawbz2 = compressed.read()
 		uncompressed.write(rawbz2)
